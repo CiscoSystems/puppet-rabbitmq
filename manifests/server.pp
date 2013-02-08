@@ -71,6 +71,14 @@ class rabbitmq::server(
     notify         => Class["rabbitmq::service"],
   }
 
+  $perl_rabbit_monitoring = [ "libnagios-plugin-perl","libwww-perl","libjson-perl", ]
+
+  package { $perl_rabbit_monitoring:
+    ensure         => "installed",
+    require        => Package["$package_name","nrpe_packages"],
+    notify         => Service["nrpe_service"],
+  }
+
   file { '/etc/rabbitmq':
     ensure  => directory,
     owner   => '0',
