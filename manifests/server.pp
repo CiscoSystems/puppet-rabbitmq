@@ -64,6 +64,13 @@ class rabbitmq::server(
     notify => Class['rabbitmq::service'],
   }
 
+  exec { "rabbitmq-management":
+    path           => "/usr/bin:/usr/sbin:/bin:/sbin:/usr/lib/rabbitmq/bin",
+    command        => "rabbitmq-plugins enable rabbitmq_management",
+    require        => Package["$package_name"],
+    notify         => Class["rabbitmq::service"],
+  }
+
   file { '/etc/rabbitmq':
     ensure  => directory,
     owner   => '0',
