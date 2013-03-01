@@ -97,12 +97,15 @@ class rabbitmq::server(
       creates => "/tmp/rabbitmq-server_2.8.7-1_all.deb",
     }
 
+    package { 'erlang-nox':
+      ensure   => $pkg_ensure_real,
+    }
+
     package { $package_name:
       ensure   => $pkg_ensure_real,
       provider => 'dpkg',
-      require  => Exec['download-rabbit'],
+      require  => [Exec['download-rabbit'],Package['erlang-nox']],
       source   => '/tmp/rabbitmq-server_2.8.7-1_all.deb',
-      notify   => Class['rabbitmq::service'],
     }
 
     file { 'erlang_cookie':
