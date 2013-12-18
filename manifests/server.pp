@@ -129,29 +129,13 @@ class rabbitmq::server(
         unless  => "/bin/grep -qx ${erlang_cookie} /var/lib/rabbitmq/.erlang.cookie"
       }
     }
-    if $config_mirrored_queues {
 
-      $mirrored_queues_pkg_name = $rabbitmq::params::mirrored_queues_pkg_name
-      $mirrored_queues_pkg_url  = $rabbitmq::params::mirrored_queues_pkg_url
-      $erlang_pkg_name          = $rabbitmq::params::erlang_pkg_name
+    package { 'erlang-nox':
+    }
 
-      exec { 'download-rabbit':
-        command => "wget -O /tmp/${mirrored_queues_pkg_name} ${mirrored_queues_pkg_url}${mirrored_queues_pkg_name} --no-check-certificate",
-        path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-        creates => "/tmp/${mirrored_queues_pkg_name}",
-      }
-
-      package { $erlang_pkg_name:
-        ensure   => $pkg_ensure_real,
-      }
-
-      package { $package_name:
-        ensure   => $pkg_ensure_real,
-        provider => 'dpkg',
-        require  => [Exec['download-rabbit'],Package[$erlang_pkg_name]],
-        source   => "/tmp/${mirrored_queues_pkg_name}",
+    package { 'rabbitmq-server':
+        require  => Package['erlang-nox'],
         notify   => Class['rabbitmq::service'],
-      }
     }
   } else {
     package { $package_name:
